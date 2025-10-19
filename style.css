@@ -8,13 +8,10 @@ body {
   padding: 20px;
 }
 h1 { margin: 10px 0 20px; font-weight: 600; }
-.stage {
-  position: relative;
-  display: inline-block;
-}
+.stage { position: relative; display: inline-block; }
 canvas#screen {
   width: 92%;
-  max-width: 720px;
+  max-width: 640px;
   background: #000;
   border: 4px solid var(--accent);
   border-radius: 12px;
@@ -26,29 +23,18 @@ canvas#screen {
   place-items: center;
   background: rgba(0,0,0,0.65);
   border-radius: 12px;
+  color: white;
+  font-size: 14px;
 }
 .spinner {
-  width: 48px; height: 48px;
-  border: 6px solid rgba(255,255,255,0.25);
+  width: 40px; height: 40px;
+  border: 5px solid rgba(255,255,255,0.25);
   border-top-color: var(--accent);
   border-radius: 50%;
   animation: spin 1s linear infinite;
   margin-bottom: 12px;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
-.status { width: 72%; max-width: 480px; }
-#status-text { margin: 4px 0 8px; font-size: 14px; opacity: 0.9; }
-.bar {
-  width: 100%; height: 10px;
-  background: rgba(255,255,255,0.15);
-  border-radius: 6px; overflow: hidden;
-}
-.bar-fill {
-  height: 100%;
-  width: 0%;
-  background: var(--accent);
-  transition: width 0.2s ease;
-}
 .menu {
   margin-top: 16px;
   display: flex;

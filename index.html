@@ -2,34 +2,28 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Switch 2 Flipbook Player</title>
+  <title>Switch 2 Frame Flipbook</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="preload" href="demo.mp4" as="video">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>Switch 2 Flipbook Player 🎮</h1>
+  <h1>Switch 2 Frame Flipbook 🎮</h1>
 
-  <!-- Hidden video: decoder source -->
+  <!-- Hidden video source -->
   <video id="src" src="demo.mp4" playsinline muted preload="auto" style="display:none"></video>
 
-  <!-- Visible canvas: frame renderer -->
+  <!-- Canvas for rendering -->
   <div class="stage">
-    <canvas id="screen" width="960" height="540"></canvas>
+    <canvas id="screen" width="320" height="180"></canvas>
     <div id="overlay" class="overlay">
       <div class="spinner"></div>
-      <div class="status">
-        <div id="status-text">Loading frames…</div>
-        <div class="bar"><div id="bar-fill" class="bar-fill" style="width:0%"></div></div>
-      </div>
+      <div id="status-text">Extracting frames…</div>
     </div>
   </div>
 
   <div class="menu">
-    <button onclick="startFlipbook()">▶ Start</button>
-    <button onclick="pauseFlipbook()">⏸ Pause</button>
+    <button onclick="playFrames()">▶ Play</button>
     <button onclick="refreshPage()">🔄 Refresh</button>
-    <button onclick="toggleOverlay()">🧱 Toggle overlay</button>
   </div>
 
   <script src="script.js"></script>
