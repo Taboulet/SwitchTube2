@@ -10,10 +10,9 @@ h1 {
   margin: 10px 0 20px;
   font-weight: 600;
 }
-video {
+canvas#screen {
   width: 92%;
   max-width: 720px;
-  aspect-ratio: 16 / 9;
   background: #000;
   border: 4px solid #e60012; /* Switch red */
   border-radius: 12px;

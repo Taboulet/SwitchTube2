@@ -2,23 +2,22 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Switch 2 Video Player</title>
+  <title>Switch 2 Flipbook Player</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="preload" href="demo.mp4" as="video">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>Switch 2 Video Player 🎮</h1>
+  <h1>Switch 2 Flipbook Player 🎮</h1>
 
-  <!-- Use direct src to the file in current directory -->
-  <video id="player" controls autoplay playsinline preload="metadata">
-    <source src="demo.mp4" type="video/mp4">
-    Sorry, your browser can't play this video.
-  </video>
+  <!-- Hidden <video> is our decoder; canvas is the visible "flipbook" -->
+  <video id="src" src="demo.mp4" playsinline muted preload="auto" style="display:none"></video>
+  <canvas id="screen" width="1280" height="720"></canvas>
 
   <div class="menu">
-    <button onclick="reloadVideo()">▶ Reload video</button>
-    <button onclick="refreshPage()">🔄 Refresh page</button>
+    <button onclick="startFlipbook()">▶ Start</button>
+    <button onclick="pauseFlipbook()">⏸ Pause</button>
+    <button onclick="refreshPage()">🔄 Refresh</button>
   </div>
 
   <script src="script.js"></script>
