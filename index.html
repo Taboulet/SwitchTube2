@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Switch 2 Video Player</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>Switch 2 Video Player 🎮</h1>
+  <video id="player" controls autoplay>
+    <source src="videos/demo.mp4" type="video/mp4">
+    Sorry, your Switch browser can’t play this video.
+  </video>
+  <div class="menu">
+    <button onclick="loadVideo('demo.mp4')">Game 1</button>
+    <button onclick="loadVideo('demo2.mp4')">Game 2</button>
+    <button onclick="refreshPage()">🔄 Refresh</button>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>
