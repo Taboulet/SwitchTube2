@@ -19,22 +19,14 @@ canvas#screen {
 .overlay {
   position: absolute;
   inset: 0;
-  display: grid;
-  place-items: center;
-  background: rgba(0,0,0,0.65);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.7);
   border-radius: 12px;
   color: white;
-  font-size: 14px;
+  font-size: 20px;
 }
-.spinner {
-  width: 40px; height: 40px;
-  border: 5px solid rgba(255,255,255,0.25);
-  border-top-color: var(--accent);
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-  margin-bottom: 12px;
-}
-@keyframes spin { to { transform: rotate(360deg); } }
 .menu {
   margin-top: 16px;
   display: flex;
