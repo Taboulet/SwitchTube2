@@ -1,20 +1,60 @@
-// Simple flipbook: draw every visible frame of the <video> to <canvas>
-// Notes:
-// - Audio is muted/omitted for now.
-// - We render frames via requestAnimationFrame for broad compatibility.
-// - If requestVideoFrameCallback is available, we use it for better frame timing.
+// Flipbook renderer targeting limited browsers.
+// - Hidden <video> decodes; <canvas> displays.
+// - Loading overlay estimates progress via buffered ranges.
+// - Uses RAF loop; optionally requestVideoFrameCallback if available.
 
 let rafId = null;
 let playing = false;
+let overlayVisible = true;
+
+function $(id) { return document.getElementById(id); }
+
+function updateOverlayText(text) {
+  const el = $('status-text');
+  if (el) el.textContent = text;
+}
+
+function updateProgressBar(video) {
+  try {
+    const dur = video.duration;
+    if (!isFinite(dur) || dur <= 0 || video.buffered.length === 0) return;
+
+    // Use last buffered range end as progress estimate
+    const end = video.buffered.end(video.buffered.length - 1);
+    const pct = Math.max(0, Math.min(100, Math.floor((end / dur) * 100)));
+    const bar = $('bar-fill');
+    if (bar) bar.style.width = pct + '%';
+    updateOverlayText(pct < 100 ? `Loading frames… ${pct}%` : 'Loaded — ready to play');
+    if (pct >= 98) hideOverlay();
+  } catch (e) {
+    // Some browsers throw; ignore and keep spinner
+  }
+}
+
+function showOverlay() {
+  const ov = $('overlay');
+  if (ov) {
+    ov.style.display = 'grid';
+    overlayVisible = true;
+  }
+}
+function hideOverlay() {
+  const ov = $('overlay');
+  if (ov) {
+    ov.style.display = 'none';
+    overlayVisible = false;
+  }
+}
+function toggleOverlay() {
+  overlayVisible ? showOverlay() : hideOverlay();
+}
 
 function drawFrame(ctx, video, canvas) {
-  // Scale to canvas while preserving aspect ratio
-  const vw = video.videoWidth || 1280;
-  const vh = video.videoHeight || 720;
+  const vw = video.videoWidth || 640;
+  const vh = video.videoHeight || 360;
   const cw = canvas.width;
   const ch = canvas.height;
 
-  // Fit video inside canvas (contain)
   const vAspect = vw / vh;
   const cAspect = cw / ch;
   let dw, dh, dx, dy;
@@ -40,18 +80,25 @@ function loopRender(ctx, video, canvas) {
 }
 
 function startFlipbook() {
-  const video = document.getElementById('src');
-  const canvas = document.getElementById('screen');
+  const video = $('src');
+  const canvas = $('screen');
   const ctx = canvas.getContext('2d');
 
-  if (!video.src) {
-    console.warn('demo.mp4 not loaded');
+  // If metadata not ready, wait then start
+  if (video.readyState < 1) {
+    updateOverlayText('Preparing video…');
+    video.addEventListener('loadedmetadata', () => startFlipbook(), { once: true });
+    // Kick load
+    try { video.load(); } catch (e) {}
     return;
   }
 
   playing = true;
 
-  // Try advanced callback if supported
+  // Hide overlay if sufficiently buffered
+  updateProgressBar(video);
+
+  // Prefer frame callback if available
   if (typeof video.requestVideoFrameCallback === 'function') {
     const onFrame = () => {
       if (!playing) return;
@@ -61,41 +108,57 @@ function startFlipbook() {
     video.play().catch(() => {});
     video.requestVideoFrameCallback(onFrame);
   } else {
-    // Fallback: play and render via RAF
+    // Fallback to RAF loop
     video.play().catch(() => {});
     loopRender(ctx, video, canvas);
   }
 }
 
 function pauseFlipbook() {
-  const video = document.getElementById('src');
+  const video = $('src');
   playing = false;
   try { video.pause(); } catch (e) {}
-  if (rafId) {
-    cancelAnimationFrame(rafId);
-    rafId = null;
-  }
+  if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
 }
 
-function refreshPage() {
-  location.reload();
-}
+function refreshPage() { location.reload(); }
 
-// Auto-start if autoplay works; otherwise show Start button usage
+// Initialize: prepare canvas, show overlay, try to play muted, track buffering
 document.addEventListener('DOMContentLoaded', () => {
-  const video = document.getElementById('src');
-  // Pre-size canvas to a friendly default
-  const canvas = document.getElementById('screen');
+  const video = $('src');
+  const canvas = $('screen');
   const ctx = canvas.getContext('2d');
+
+  // Fill black initially
   ctx.fillStyle = '#000';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  // Attempt silent autoplay; many browsers require user gesture even when muted
+  showOverlay();
+  updateOverlayText('Loading frames… 0%');
+
+  // Periodically update buffering progress
+  const progressTimer = setInterval(() => {
+    updateProgressBar(video);
+  }, 300);
+
+  // When enough data to play
+  video.addEventListener('canplay', () => {
+    updateOverlayText('Buffered — ready to play');
+  });
+
+  // Auto-start if autoplay permitted
   video.play().then(() => {
-    // If it plays, start drawing automatically
     startFlipbook();
   }).catch(() => {
-    // If autoplay fails, user can press Start
-    // We leave buttons visible for manual start
+    // Leave overlay up; user can press Start
+    updateOverlayText('Tap ▶ Start to begin');
   });
+
+  // Cleanup on page hide
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) pauseFlipbook();
+  });
+
+  // Ensure timer cleared on unload
+  window.addEventListener('unload', () => clearInterval(progressTimer));
 });

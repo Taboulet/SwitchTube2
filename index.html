@@ -10,14 +10,26 @@
 <body>
   <h1>Switch 2 Flipbook Player 🎮</h1>
 
-  <!-- Hidden <video> is our decoder; canvas is the visible "flipbook" -->
+  <!-- Hidden video: decoder source -->
   <video id="src" src="demo.mp4" playsinline muted preload="auto" style="display:none"></video>
-  <canvas id="screen" width="1280" height="720"></canvas>
+
+  <!-- Visible canvas: frame renderer -->
+  <div class="stage">
+    <canvas id="screen" width="960" height="540"></canvas>
+    <div id="overlay" class="overlay">
+      <div class="spinner"></div>
+      <div class="status">
+        <div id="status-text">Loading frames…</div>
+        <div class="bar"><div id="bar-fill" class="bar-fill" style="width:0%"></div></div>
+      </div>
+    </div>
+  </div>
 
   <div class="menu">
     <button onclick="startFlipbook()">▶ Start</button>
     <button onclick="pauseFlipbook()">⏸ Pause</button>
     <button onclick="refreshPage()">🔄 Refresh</button>
+    <button onclick="toggleOverlay()">🧱 Toggle overlay</button>
   </div>
 
   <script src="script.js"></script>
